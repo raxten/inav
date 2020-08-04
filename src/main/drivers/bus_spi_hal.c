@@ -69,7 +69,7 @@
 #endif
 
 #if defined(USE_SPI_DEVICE_1)
-static const uint16_t spiDivisorMapFast[] = {
+static const uint32_t spiDivisorMapFast[] = {
     LL_SPI_BAUDRATEPRESCALER_DIV256,    // SPI_CLOCK_INITIALIZATON      421.875 KBits/s
     LL_SPI_BAUDRATEPRESCALER_DIV32,     // SPI_CLOCK_SLOW               843.75 KBits/s
     LL_SPI_BAUDRATEPRESCALER_DIV16,     // SPI_CLOCK_STANDARD           6.75 MBits/s
@@ -79,7 +79,7 @@ static const uint16_t spiDivisorMapFast[] = {
 #endif
 
 #if defined(USE_SPI_DEVICE_2) || defined(USE_SPI_DEVICE_3) || defined(USE_SPI_DEVICE_4)
-static const uint16_t spiDivisorMapSlow[] = {
+static const uint32_t spiDivisorMapSlow[] = {
     LL_SPI_BAUDRATEPRESCALER_DIV256,    // SPI_CLOCK_INITIALIZATON      210.937 KBits/s
     LL_SPI_BAUDRATEPRESCALER_DIV64,     // SPI_CLOCK_SLOW               843.75 KBits/s
     LL_SPI_BAUDRATEPRESCALER_DIV8,      // SPI_CLOCK_STANDARD           6.75 MBits/s
@@ -237,6 +237,7 @@ bool spiIsBusBusy(SPI_TypeDef *instance)
 bool spiTransfer(SPI_TypeDef *instance, uint8_t *rxData, const uint8_t *txData, int len)
 {
     SET_BIT(instance->CR2, SPI_RXFIFO_THRESHOLD);
+
     while (len) {
         int spiTimeout = 1000;
         while (!LL_SPI_IsActiveFlag_TXE(instance)) {

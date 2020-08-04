@@ -81,7 +81,6 @@
 #define TARGET_IO_PORTE 0xffff
 
 
-#if 0
 // *************** SPI1 Gyro & ACC *******************
 #define USE_SPI
 #define USE_SPI_DEVICE_1
@@ -108,6 +107,7 @@
 #define MPU6500_CS_PIN          PD7
 #define MPU6500_EXTI_PIN        PD4
 
+#if 0
 
 #define USE_EXTI
 #define USE_MPU_DATA_READY_SIGNAL

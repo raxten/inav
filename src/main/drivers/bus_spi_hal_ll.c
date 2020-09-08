@@ -27,6 +27,34 @@
 #include "drivers/nvic.h"
 #include "rcc.h"
 
+#ifndef SPI1_SCK_PIN
+#define SPI1_NSS_PIN    PA4
+#define SPI1_SCK_PIN    PA5
+#define SPI1_MISO_PIN   PA6
+#define SPI1_MOSI_PIN   PA7
+#endif
+
+#ifndef SPI2_SCK_PIN
+#define SPI2_NSS_PIN    PB12
+#define SPI2_SCK_PIN    PB13
+#define SPI2_MISO_PIN   PB14
+#define SPI2_MOSI_PIN   PB15
+#endif
+
+#ifndef SPI3_SCK_PIN
+#define SPI3_NSS_PIN    PA15
+#define SPI3_SCK_PIN    PB3
+#define SPI3_MISO_PIN   PB4
+#define SPI3_MOSI_PIN   PB5
+#endif
+
+#ifndef SPI4_SCK_PIN
+#define SPI4_NSS_PIN    PA15
+#define SPI4_SCK_PIN    PB3
+#define SPI4_MISO_PIN   PB4
+#define SPI4_MOSI_PIN   PB5
+#endif
+
 #ifndef SPI1_NSS_PIN
 #define SPI1_NSS_PIN NONE
 #endif
@@ -40,41 +68,39 @@
 #define SPI4_NSS_PIN NONE
 #endif
 
-#define MAX_SPI_BUS_COUNT   4
-
 #if defined(USE_SPI_DEVICE_1)
 static const uint32_t spiDivisorMapFast[] = {
-    SPI_BAUDRATEPRESCALER_256,      // SPI_CLOCK_INITIALIZATON      421.875 KBits/s
-    SPI_BAUDRATEPRESCALER_32,       // SPI_CLOCK_SLOW               843.75 KBits/s
-    SPI_BAUDRATEPRESCALER_16,       // SPI_CLOCK_STANDARD           6.75 MBits/s
-    SPI_BAUDRATEPRESCALER_8,        // SPI_CLOCK_FAST               13.5 MBits/s
-    SPI_BAUDRATEPRESCALER_4         // SPI_CLOCK_ULTRAFAST          27.0 MBits/s
+    LL_SPI_BAUDRATEPRESCALER_DIV256,    // SPI_CLOCK_INITIALIZATON      421.875 KBits/s
+    LL_SPI_BAUDRATEPRESCALER_DIV32,     // SPI_CLOCK_SLOW               843.75 KBits/s
+    LL_SPI_BAUDRATEPRESCALER_DIV16,     // SPI_CLOCK_STANDARD           6.75 MBits/s
+    LL_SPI_BAUDRATEPRESCALER_DIV8,      // SPI_CLOCK_FAST               13.5 MBits/s
+    LL_SPI_BAUDRATEPRESCALER_DIV4       // SPI_CLOCK_ULTRAFAST          27.0 MBits/s
 };
 #endif
 
 #if defined(USE_SPI_DEVICE_2) || defined(USE_SPI_DEVICE_3) || defined(USE_SPI_DEVICE_4)
 static const uint32_t spiDivisorMapSlow[] = {
-    SPI_BAUDRATEPRESCALER_256,      // SPI_CLOCK_INITIALIZATON      210.937 KBits/s
-    SPI_BAUDRATEPRESCALER_64,       // SPI_CLOCK_SLOW               843.75 KBits/s
-    SPI_BAUDRATEPRESCALER_8,        // SPI_CLOCK_STANDARD           6.75 MBits/s
-    SPI_BAUDRATEPRESCALER_4,        // SPI_CLOCK_FAST               13.5 MBits/s
-    SPI_BAUDRATEPRESCALER_2         // SPI_CLOCK_ULTRAFAST          27.0 MBits/s
+    LL_SPI_BAUDRATEPRESCALER_DIV256,    // SPI_CLOCK_INITIALIZATON      210.937 KBits/s
+    LL_SPI_BAUDRATEPRESCALER_DIV64,     // SPI_CLOCK_SLOW               843.75 KBits/s
+    LL_SPI_BAUDRATEPRESCALER_DIV8,      // SPI_CLOCK_STANDARD           6.75 MBits/s
+    LL_SPI_BAUDRATEPRESCALER_DIV4,      // SPI_CLOCK_FAST               13.5 MBits/s
+    LL_SPI_BAUDRATEPRESCALER_DIV2       // SPI_CLOCK_ULTRAFAST          27.0 MBits/s
 };
 #endif
 
-static spiDevice_t spiHardwareMap[MAX_SPI_BUS_COUNT] = {
+static spiDevice_t spiHardwareMap[] = {
 #ifdef USE_SPI_DEVICE_1
     { .dev = SPI1, .nss = IO_TAG(SPI1_NSS_PIN), .sck = IO_TAG(SPI1_SCK_PIN), .miso = IO_TAG(SPI1_MISO_PIN), .mosi = IO_TAG(SPI1_MOSI_PIN), .rcc = RCC_APB2(SPI1), .af = GPIO_AF5_SPI1, .divisorMap = spiDivisorMapFast },
 #else
     { .dev = NULL },    // No SPI1
 #endif
 #ifdef USE_SPI_DEVICE_2
-    { .dev = SPI2, .nss = IO_TAG(SPI2_NSS_PIN), .sck = IO_TAG(SPI2_SCK_PIN), .miso = IO_TAG(SPI2_MISO_PIN), .mosi = IO_TAG(SPI2_MOSI_PIN), .rcc = RCC_APB1L(SPI2), .af = GPIO_AF5_SPI2, .divisorMap = spiDivisorMapSlow },
+    { .dev = SPI2, .nss = IO_TAG(SPI2_NSS_PIN), .sck = IO_TAG(SPI2_SCK_PIN), .miso = IO_TAG(SPI2_MISO_PIN), .mosi = IO_TAG(SPI2_MOSI_PIN), .rcc = RCC_APB1(SPI2), .af = GPIO_AF5_SPI2, .divisorMap = spiDivisorMapSlow },
 #else
     { .dev = NULL },    // No SPI2
 #endif
 #ifdef USE_SPI_DEVICE_3
-    { .dev = SPI3, .nss = IO_TAG(SPI3_NSS_PIN), .sck = IO_TAG(SPI3_SCK_PIN), .miso = IO_TAG(SPI3_MISO_PIN), .mosi = IO_TAG(SPI3_MOSI_PIN), .rcc = RCC_APB1L(SPI3), .af = GPIO_AF6_SPI3, .divisorMap = spiDivisorMapSlow },
+    { .dev = SPI3, .nss = IO_TAG(SPI3_NSS_PIN), .sck = IO_TAG(SPI3_SCK_PIN), .miso = IO_TAG(SPI3_MISO_PIN), .mosi = IO_TAG(SPI3_MOSI_PIN), .rcc = RCC_APB1(SPI3), .af = GPIO_AF6_SPI3, .divisorMap = spiDivisorMapSlow },
 #else
     { .dev = NULL },    // No SPI3
 #endif
@@ -84,8 +110,6 @@ static spiDevice_t spiHardwareMap[MAX_SPI_BUS_COUNT] = {
     { .dev = NULL }     // No SPI4
 #endif
 };
-
-static SPI_HandleTypeDef hspi[MAX_SPI_BUS_COUNT];
 
 SPIDevice spiDeviceByInstance(SPI_TypeDef *instance)
 {
@@ -116,8 +140,7 @@ void spiTimeoutUserCallback(SPI_TypeDef *instance)
 
 bool spiInitDevice(SPIDevice device, bool leadingEdge)
 {
-    spiDevice_t *spi = &spiHardwareMap[device];
-    SPI_HandleTypeDef * pHspi = &hspi[device];
+    spiDevice_t *spi = &(spiHardwareMap[device]);
 
     if (!spi->dev) {
         return false;
@@ -148,34 +171,32 @@ bool spiInitDevice(SPIDevice device, bool leadingEdge)
         IOConfigGPIO(IOGetByTag(spi->nss), SPI_IO_CS_CFG);
     }
 
-    pHspi->Instance = spi->dev;
+    LL_SPI_Disable(spi->dev);
+    LL_SPI_DeInit(spi->dev);
 
-    HAL_SPI_DeInit(pHspi);
+    LL_SPI_InitTypeDef init =
+    {
+        .TransferDirection = SPI_DIRECTION_2LINES,
+        .Mode = SPI_MODE_MASTER,
+        .DataWidth = SPI_DATASIZE_8BIT,
+        .ClockPolarity = leadingEdge ? SPI_POLARITY_LOW : SPI_POLARITY_HIGH,
+        .ClockPhase = leadingEdge ? SPI_PHASE_1EDGE : SPI_PHASE_2EDGE,
+        .NSS = SPI_NSS_SOFT,
+        .BaudRate = SPI_BAUDRATEPRESCALER_8,
+        .BitOrder = SPI_FIRSTBIT_MSB,
+        .CRCPoly = 7,
+        .CRCCalculation = SPI_CRCCALCULATION_DISABLE,
+    };
+    LL_SPI_SetRxFIFOThreshold(spi->dev, SPI_RXFIFO_THRESHOLD_QF);
 
-    pHspi->Init.Mode = SPI_MODE_MASTER;
-    pHspi->Init.Direction = SPI_DIRECTION_2LINES;
-    pHspi->Init.DataSize = SPI_DATASIZE_8BIT;
-    pHspi->Init.NSS = SPI_NSS_SOFT;
-    pHspi->Init.FirstBit = SPI_FIRSTBIT_MSB;
-    pHspi->Init.CRCPolynomial = 7;
-    pHspi->Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_256;
-    pHspi->Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
-    pHspi->Init.TIMode = SPI_TIMODE_DISABLED;
+    LL_SPI_Init(spi->dev, &init);
+    LL_SPI_Enable(spi->dev);
 
-    if (leadingEdge) {
-        pHspi->Init.CLKPolarity = SPI_POLARITY_LOW;
-        pHspi->Init.CLKPhase = SPI_PHASE_1EDGE;
-    }
-    else {
-        pHspi->Init.CLKPolarity = SPI_POLARITY_HIGH;
-        pHspi->Init.CLKPhase = SPI_PHASE_2EDGE;
-    }
+    SET_BIT(spi->dev->CR2, SPI_RXFIFO_THRESHOLD);
 
     if (spi->nss) {
         IOHi(IOGetByTag(spi->nss));
     }
-
-    HAL_SPI_Init(pHspi);
 
     spi->initDone = true;
     return true;
@@ -183,9 +204,26 @@ bool spiInitDevice(SPIDevice device, bool leadingEdge)
 
 uint8_t spiTransferByte(SPI_TypeDef *instance, uint8_t txByte)
 {
-    uint8_t rxData;
-    spiTransfer(instance, &txByte, &rxData, 1);
-    return rxData;
+    uint16_t spiTimeout = 1000;
+
+    while (!LL_SPI_IsActiveFlag_TXE(instance)) {
+        if ((spiTimeout--) == 0) {
+            spiTimeoutUserCallback(instance);
+            return 0xFF;
+        }
+    }
+
+    LL_SPI_TransmitData8(instance, txByte);
+
+    spiTimeout = 1000;
+    while (!LL_SPI_IsActiveFlag_RXNE(instance)) {
+        if ((spiTimeout--) == 0) {
+            spiTimeoutUserCallback(instance);
+            return 0xFF;
+        }
+    }
+
+    return (uint8_t)LL_SPI_ReceiveData8(instance);
 }
 
 /**
@@ -193,28 +231,36 @@ uint8_t spiTransferByte(SPI_TypeDef *instance, uint8_t txByte)
  */
 bool spiIsBusBusy(SPI_TypeDef *instance)
 {
-    SPIDevice device = spiDeviceByInstance(instance);
-    return (hspi[device].State == HAL_SPI_STATE_BUSY);
+    return (LL_SPI_GetTxFIFOLevel(instance) != LL_SPI_TX_FIFO_EMPTY) || LL_SPI_IsActiveFlag_BSY(instance);
 }
 
 bool spiTransfer(SPI_TypeDef *instance, uint8_t *rxData, const uint8_t *txData, int len)
 {
-    SPIDevice device = spiDeviceByInstance(instance);
-    SPI_HandleTypeDef * pHspi = &hspi[device];
-    HAL_StatusTypeDef status;
+    SET_BIT(instance->CR2, SPI_RXFIFO_THRESHOLD);
 
-    #define SPI_DEFAULT_TIMEOUT 10
+    while (len) {
+        int spiTimeout = 1000;
+        while (!LL_SPI_IsActiveFlag_TXE(instance)) {
+            if ((spiTimeout--) == 0) {
+                spiTimeoutUserCallback(instance);
+                return false;
+            }
+        }
+        uint8_t b = txData ? *(txData++) : 0xFF;
+        LL_SPI_TransmitData8(instance, b);
 
-    if (!rxData) {
-        status = HAL_SPI_Transmit(pHspi, txData, len, SPI_DEFAULT_TIMEOUT);
-    } else if(!txData) {
-        status = HAL_SPI_Receive(pHspi, rxData, len, SPI_DEFAULT_TIMEOUT);
-    } else {
-        status = HAL_SPI_TransmitReceive(pHspi, txData, rxData, len, SPI_DEFAULT_TIMEOUT);
-    }
-
-    if(status != HAL_OK) {
-        spiTimeoutUserCallback(instance);
+        spiTimeout = 1000;
+        while (!LL_SPI_IsActiveFlag_RXNE(instance)) {
+            if ((spiTimeout--) == 0) {
+                spiTimeoutUserCallback(instance);
+                return false;
+            }
+        }
+        b = LL_SPI_ReceiveData8(instance);
+        if (rxData) {
+            *(rxData++) = b;
+        }
+        --len;
     }
 
     return true;
@@ -223,11 +269,9 @@ bool spiTransfer(SPI_TypeDef *instance, uint8_t *rxData, const uint8_t *txData, 
 void spiSetSpeed(SPI_TypeDef *instance, SPIClockSpeed_e speed)
 {
     SPIDevice device = spiDeviceByInstance(instance);
-    SPI_HandleTypeDef * pHspi = &hspi[device];
-
-    HAL_SPI_DeInit(pHspi);
-    pHspi->Init.BaudRatePrescaler = spiHardwareMap[device].divisorMap[speed];
-    HAL_SPI_Init(pHspi);
+    LL_SPI_Disable(instance);
+    LL_SPI_SetBaudRatePrescaler(instance, spiHardwareMap[device].divisorMap[speed]);
+    LL_SPI_Enable(instance);
 }
 
 SPI_TypeDef * spiInstanceByDevice(SPIDevice device)

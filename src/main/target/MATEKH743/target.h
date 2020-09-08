@@ -21,8 +21,8 @@
 #define TARGET_BOARD_IDENTIFIER "H765"
 #define USBD_PRODUCT_STRING     "MATEKH765"
 
-#define LED0                    PD10
-#define LED1                    PD11
+#define LED0                    PE3
+#define LED1                    PE4
 
 #define BEEPER                  PA15
 #define BEEPER_INVERTED

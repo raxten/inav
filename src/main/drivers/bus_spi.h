@@ -70,7 +70,7 @@ typedef struct SPIDevice_s {
     ioTag_t miso;
     rccPeriphTag_t rcc;
     uint8_t af;
-    const uint16_t * divisorMap;
+    const uint32_t * divisorMap;
     volatile uint16_t errorCount;
     bool initDone;
 } spiDevice_t;

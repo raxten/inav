@@ -40,8 +40,6 @@
 #define SPI4_NSS_PIN NONE
 #endif
 
-#define MAX_SPI_BUS_COUNT   4
-
 #if defined(USE_SPI_DEVICE_1)
 static const uint32_t spiDivisorMapFast[] = {
     SPI_BAUDRATEPRESCALER_256,      // SPI_CLOCK_INITIALIZATON      421.875 KBits/s
@@ -62,7 +60,7 @@ static const uint32_t spiDivisorMapSlow[] = {
 };
 #endif
 
-static spiDevice_t spiHardwareMap[MAX_SPI_BUS_COUNT] = {
+static spiDevice_t spiHardwareMap[SPIDEV_COUNT] = {
 #ifdef USE_SPI_DEVICE_1
     { .dev = SPI1, .nss = IO_TAG(SPI1_NSS_PIN), .sck = IO_TAG(SPI1_SCK_PIN), .miso = IO_TAG(SPI1_MISO_PIN), .mosi = IO_TAG(SPI1_MOSI_PIN), .rcc = RCC_APB2(SPI1), .af = GPIO_AF5_SPI1, .divisorMap = spiDivisorMapFast },
 #else
@@ -85,7 +83,7 @@ static spiDevice_t spiHardwareMap[MAX_SPI_BUS_COUNT] = {
 #endif
 };
 
-static SPI_HandleTypeDef hspi[MAX_SPI_BUS_COUNT];
+static SPI_HandleTypeDef hspi[SPIDEV_COUNT];
 
 SPIDevice spiDeviceByInstance(SPI_TypeDef *instance)
 {

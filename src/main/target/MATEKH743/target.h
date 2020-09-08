@@ -80,32 +80,55 @@
 #define TARGET_IO_PORTD 0xffff
 #define TARGET_IO_PORTE 0xffff
 
+// *************** IMU generic ***********************
+#define USE_DUAL_GYRO
 
-// *************** SPI1 Gyro & ACC *******************
+// *************** SPI1 IMU1 *************************
 #define USE_SPI
 #define USE_SPI_DEVICE_1
 #define SPI1_SCK_PIN            PA5
 #define SPI1_MISO_PIN           PA6
-#define SPI1_MOSI_PIN           PA7
-
-#define USE_SPI_DEVICE_3
-#define SPI3_SCK_PIN            PB3
-#define SPI3_MISO_PIN           PB4
-#define SPI3_MOSI_PIN           PB5
-
-#define USE_DUAL_GYRO
+#define SPI1_MOSI_PIN           PD7
 
 #define USE_IMU_MPU6000
 #define IMU_MPU6000_ALIGN       CW90_DEG_FLIP
 #define MPU6000_SPI_BUS         BUS_SPI1
-#define MPU6000_CS_PIN          PC4
-#define MPU6000_EXTI_PIN        PB2
+#define MPU6000_CS_PIN          PC15
+#define MPU6000_EXTI_PIN        NONE
+
+// *************** SPI2 OSD ***********************
+#define USE_SPI_DEVICE_2
+#define SPI2_SCK_PIN            PB13
+#define SPI2_MISO_PIN           PB14
+#define SPI2_MOSI_PIN           PB15
+
+/*
+#define USE_OSD
+#define USE_MAX7456
+#define MAX7456_SPI_BUS         BUS_SPI2
+#define MAX7456_CS_PIN          PB12
+*/
+
+// *************** SPI3 SD BLACKBOX*******************
+/*
+#define USE_SDCARD
+#define USE_SDCARD_SDIO
+#define SDCARD_SDIO_DMA         DMA_TAG(2,3,4)
+#define SDCARD_SDIO_4BIT
+#define ENABLE_BLACKBOX_LOGGING_ON_SDCARD_BY_DEFAULT
+*/
+
+// *************** SPI4 IMU2 *************************
+#define USE_SPI_DEVICE_4
+#define SPI4_SCK_PIN            PE12
+#define SPI4_MISO_PIN           PE13
+#define SPI4_MOSI_PIN           PE14
 
 #define USE_IMU_MPU6500
 #define IMU_MPU6500_ALIGN       CW270_DEG_FLIP
-#define MPU6500_SPI_BUS         BUS_SPI3
-#define MPU6500_CS_PIN          PD7
-#define MPU6500_EXTI_PIN        PD4
+#define MPU6500_SPI_BUS         BUS_SPI4
+#define MPU6500_CS_PIN          PE11
+#define MPU6500_EXTI_PIN        NONE
 
 #if 0
 
@@ -142,32 +165,6 @@
 
 #define USE_RANGEFINDER
 #define RANGEFINDER_I2C_BUS     BUS_I2C2
-
-// *************** SPI2 OSD ***********************
-#define USE_SPI_DEVICE_2
-#define SPI2_SCK_PIN            PB13
-#define SPI2_MISO_PIN           PB14
-#define SPI2_MOSI_PIN           PB15
-
-#define USE_OSD
-#define USE_MAX7456
-#define MAX7456_SPI_BUS         BUS_SPI2
-#define MAX7456_CS_PIN          PB12
-
-// *************** SPI4 ******************************
-/*
-#define USE_SPI_DEVICE_4
-#define SPI4_SCK_PIN            PE12
-#define SPI4_MISO_PIN           PE13
-#define SPI4_MOSI_PIN           PE14
-*/
-
-// *************** SPI3 SD BLACKBOX*******************
-#define USE_SDCARD
-#define USE_SDCARD_SDIO
-#define SDCARD_SDIO_DMA         DMA_TAG(2,3,4)
-#define SDCARD_SDIO_4BIT
-#define ENABLE_BLACKBOX_LOGGING_ON_SDCARD_BY_DEFAULT
 
 // *************** ADC *****************************
 #define USE_ADC

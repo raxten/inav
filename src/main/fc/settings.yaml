@@ -25,7 +25,7 @@ tables:
     values: ["NONE", "PPM", "SERIAL", "MSP", "SPI", "UIB"]
     enum: rxReceiverType_e
   - name: serial_rx
-    values: ["SPEK1024", "SPEK2048", "SBUS", "SUMD", "SUMH", "XB-B", "XB-B-RJ01", "IBUS", "JETIEXBUS", "CRSF", "FPORT", "FPORT2", "SBUS_FAST"]
+    values: ["SPEK1024", "SPEK2048", "SBUS", "SUMD", "SUMH", "XB-B", "XB-B-RJ01", "IBUS", "JETIEXBUS", "CRSF", "FPORT", "SBUS_FAST", "FPORT2"]
   - name: rx_spi_protocol
     values: ["V202_250K", "V202_1M", "SYMA_X", "SYMA_X5C", "CX10", "CX10A", "H8_3D", "INAV", "ELERES"]
     enum: rx_spi_protocol_e
@@ -125,7 +125,7 @@ tables:
     values: ["OFF", "RP", "RPY"]
     enum: itermRelax_e
   - name: airmodeHandlingType
-    values: ["STICK_CENTER", "THROTTLE_THRESHOLD"]
+    values: ["STICK_CENTER", "THROTTLE_THRESHOLD", "STICK_CENTER_ONCE"]
   - name: nav_extra_arming_safety
     values: ["OFF", "ON", "ALLOW_BYPASS"]
     enum: navExtraArmingSafety_e
@@ -141,6 +141,9 @@ tables:
   - name: osd_ahi_style
     values: ["DEFAULT", "LINE"]
     enum: osd_ahi_style_e
+  - name: tristate
+    enum: tristate_e
+    values: ["AUTO", "ON", "OFF"]
 
 groups:
   - name: PG_GYRO_CONFIG
@@ -400,6 +403,24 @@ groups:
         field: magZero.raw[Z]
         min: INT16_MIN
         max: INT16_MAX
+      - name: maggain_x
+        description: "Magnetometer calibration X gain. If 1024, no calibration or calibration failed"
+        default_value: "1024"
+        field: magGain[X]
+        min: INT16_MIN
+        max: INT16_MAX
+      - name: maggain_y
+        description: "Magnetometer calibration Y gain. If 1024, no calibration or calibration failed"
+        default_value: "1024"
+        field: magGain[Y]
+        min: INT16_MIN
+        max: INT16_MAX
+      - name: maggain_z
+        description: "Magnetometer calibration Z gain. If 1024, no calibration or calibration failed"
+        default_value: "1024"
+        field: magGain[Z]
+        min: INT16_MIN
+        max: INT16_MAX
       - name: mag_calibration_time
         description: "Adjust how long time the Calibration of mag will last."
         default_value: "30"
@@ -557,10 +578,10 @@ groups:
         min: PWM_PULSE_MIN
         max: PWM_PULSE_MAX
       - name: serialrx_halfduplex
-        description: "Allow serial receiver to operate on UART TX pin. With some receivers will allow control and telemetry over a single wire"
-        default_value: "OFF"
+        description: "Allow serial receiver to operate on UART TX pin. With some receivers will allow control and telemetry over a single wire."
+        default_value: "AUTO"
         field: halfDuplex
-        type: bool
+        table: tristate
       - name: msp_override_channels
         description: "Mask of RX channels that may be overridden by MSP `SET_RAW_RC`. Note that this requires custom firmware with `USE_RX_MSP` and `USE_MSP_RC_OVERRIDE` compile options and the `MSP RC Override` flight mode."
         default_value: "0"
@@ -647,7 +668,7 @@ groups:
         description: "The percentage of the throttle range (`max_throttle` - `min_command`) above `min_command` used for minimum / idle throttle."
         default_value: "15"
         field: throttleIdle
-        min: 4
+        min: 0
         max: 30
       - name: motor_poles
         field: motorPoleCount
@@ -2689,6 +2710,12 @@ groups:
         condition: USE_BARO
         min: -550
         max: 1250
+      - name: osd_snr_alarm
+        description: "Value below which Crossfire SNR Alarm pops-up. (dB)"
+        default_value: "8"
+        field: snr_alarm
+        min: -12
+        max: 8
       - name: osd_temp_label_align
         description: "Allows to chose between left and right alignment for the OSD temperature sensor labels. Valid values are `LEFT` and `RIGHT`"
         default_value: "LEFT"

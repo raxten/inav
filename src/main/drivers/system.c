@@ -36,16 +36,31 @@ void cycleCounterInit(void)
 {
     extern uint32_t usTicks; // From drivers/time.h
 #if defined(USE_HAL_DRIVER)
-    usTicks = HAL_RCC_GetSysClockFreq() / 1000000;
+    // We assume that SystemCoreClock is already set to a correct value by init code
+    usTicks = SystemCoreClock / 1000000;
+    nsTicks = SystemCoreClock / 1000;
 #else
     RCC_ClocksTypeDef clocks;
     RCC_GetClocksFreq(&clocks);
     usTicks = clocks.SYSCLK_Frequency / 1000000;
-
+    nsTicks = clocks.SYSCLK_Frequency / 1000;
 #endif
 
     // Enable DWT for precision time measurement
     CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
+
+#if defined(DWT_LAR_UNLOCK_VALUE)
+#if defined(STM32F7) || defined(STM32H7)
+    DWT->LAR = DWT_LAR_UNLOCK_VALUE;
+#elif defined(STM32F3) || defined(STM32F4)
+    // Note: DWT_Type does not contain LAR member.
+#define DWT_LAR
+    __O uint32_t *DWTLAR = (uint32_t *)(DWT_BASE + 0x0FB0);
+    *(DWTLAR) = DWT_LAR_UNLOCK_VALUE;
+#endif
+#endif
+
+    DWT->CYCCNT = 0;
     DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
 }
 

@@ -182,7 +182,7 @@ bool spiInitDevice(SPIDevice device, bool leadingEdge)
 
     // Enable SPI clock
     RCC_ClockCmd(spi->rcc, ENABLE);
-    RCC_ResetCmd(spi->rcc, ENABLE);
+    RCC_ResetCmd(spi->rcc, DISABLE);
 
     IOInit(IOGetByTag(spi->sck),  OWNER_SPI, RESOURCE_SPI_SCK,  device + 1);
     IOInit(IOGetByTag(spi->miso), OWNER_SPI, RESOURCE_SPI_MISO, device + 1);

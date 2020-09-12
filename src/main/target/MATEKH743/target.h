@@ -82,6 +82,7 @@
 
 // *************** IMU generic ***********************
 #define USE_DUAL_GYRO
+#define USE_TARGET_IMU_HARDWARE_DESCRIPTORS
 
 // *************** SPI1 IMU1 *************************
 #define USE_SPI
@@ -91,10 +92,12 @@
 #define SPI1_MOSI_PIN           PD7
 
 #define USE_IMU_MPU6000
-#define IMU_MPU6000_ALIGN       CW90_DEG_FLIP
-#define MPU6000_SPI_BUS         BUS_SPI1
-#define MPU6000_CS_PIN          PC15
-#define MPU6000_EXTI_PIN        NONE
+#define USE_IMU_MPU6500
+
+#define IMU1_ALIGN              CW90_DEG_FLIP
+#define IMU1_SPI_BUS            BUS_SPI1
+#define IMU1_CS_PIN             PC15
+#define IMU1_EXTI_PIN           NONE
 
 // *************** SPI2 OSD ***********************
 #define USE_SPI_DEVICE_2
@@ -124,11 +127,10 @@
 #define SPI4_MISO_PIN           PE13
 #define SPI4_MOSI_PIN           PE14
 
-#define USE_IMU_MPU6500
-#define IMU_MPU6500_ALIGN       CW270_DEG_FLIP
-#define MPU6500_SPI_BUS         BUS_SPI4
-#define MPU6500_CS_PIN          PE11
-#define MPU6500_EXTI_PIN        NONE
+#define IMU2_ALIGN              CW270_DEG_FLIP
+#define IMU2_SPI_BUS            BUS_SPI4
+#define IMU2_CS_PIN             PE11
+#define IMU2_EXTI_PIN           NONE
 
 #if 0
 

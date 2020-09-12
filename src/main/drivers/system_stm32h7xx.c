@@ -28,8 +28,6 @@
 #include "drivers/nvic.h"
 #include "drivers/system.h"
 
-void SystemClock_Config(void);
-
 void forcedSystemResetWithoutDisablingCaches(void)
 {
     persistentObjectWrite(PERSISTENT_OBJECT_RESET_REASON, RESET_NONE);
@@ -81,7 +79,6 @@ void systemInit(void)
     cycleCounterInit();
 
     // SysTick
-    //SysTick_Config(SystemCoreClock / 1000);
-    HAL_SYSTICK_Config(HAL_RCC_GetHCLKFreq() / 1000);
+    HAL_SYSTICK_Config(SystemCoreClock / 1000);
     HAL_SYSTICK_CLKSourceConfig(SYSTICK_CLKSOURCE_HCLK);
 }

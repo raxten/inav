@@ -17,9 +17,11 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <string.h>
 
 #include <platform.h>
 
+#include "build/debug.h"
 #include "drivers/bus_spi.h"
 #include "dma.h"
 #include "drivers/io.h"
@@ -83,7 +85,7 @@ static spiDevice_t spiHardwareMap[SPIDEV_COUNT] = {
 #endif
 };
 
-static SPI_HandleTypeDef hspi[SPIDEV_COUNT];
+static SPI_HandleTypeDef spiHandle[SPIDEV_COUNT];
 
 SPIDevice spiDeviceByInstance(SPI_TypeDef *instance)
 {
@@ -115,7 +117,6 @@ void spiTimeoutUserCallback(SPI_TypeDef *instance)
 bool spiInitDevice(SPIDevice device, bool leadingEdge)
 {
     spiDevice_t *spi = &spiHardwareMap[device];
-    SPI_HandleTypeDef * pHspi = &hspi[device];
 
     if (!spi->dev) {
         return false;
@@ -127,7 +128,7 @@ bool spiInitDevice(SPIDevice device, bool leadingEdge)
 
     // Enable SPI clock
     RCC_ClockCmd(spi->rcc, ENABLE);
-    RCC_ResetCmd(spi->rcc, ENABLE);
+    RCC_ResetCmd(spi->rcc, DISABLE);
 
     IOInit(IOGetByTag(spi->sck),  OWNER_SPI, RESOURCE_SPI_SCK,  device + 1);
     IOInit(IOGetByTag(spi->miso), OWNER_SPI, RESOURCE_SPI_MISO, device + 1);
@@ -146,34 +147,38 @@ bool spiInitDevice(SPIDevice device, bool leadingEdge)
         IOConfigGPIO(IOGetByTag(spi->nss), SPI_IO_CS_CFG);
     }
 
-    pHspi->Instance = spi->dev;
+    SPI_HandleTypeDef * hspi = &spiHandle[device];
+    memset(hspi, 0, sizeof(SPI_HandleTypeDef));
+    hspi->Instance = spi->dev;
 
-    HAL_SPI_DeInit(pHspi);
+    HAL_SPI_DeInit(hspi);
 
-    pHspi->Init.Mode = SPI_MODE_MASTER;
-    pHspi->Init.Direction = SPI_DIRECTION_2LINES;
-    pHspi->Init.DataSize = SPI_DATASIZE_8BIT;
-    pHspi->Init.NSS = SPI_NSS_SOFT;
-    pHspi->Init.FirstBit = SPI_FIRSTBIT_MSB;
-    pHspi->Init.CRCPolynomial = 7;
-    pHspi->Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_256;
-    pHspi->Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
-    pHspi->Init.TIMode = SPI_TIMODE_DISABLED;
+    hspi->Init.Mode = SPI_MODE_MASTER;
+    hspi->Init.Direction = SPI_DIRECTION_2LINES;
+    hspi->Init.DataSize = SPI_DATASIZE_8BIT;
+    hspi->Init.NSS = SPI_NSS_SOFT;
+    hspi->Init.FirstBit = SPI_FIRSTBIT_MSB;
+    hspi->Init.CRCPolynomial = 7;
+    hspi->Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_256;
+    hspi->Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
+    hspi->Init.TIMode = SPI_TIMODE_DISABLED;
+    hspi->Init.FifoThreshold = SPI_FIFO_THRESHOLD_01DATA;
+    hspi->Init.MasterKeepIOState = SPI_MASTER_KEEP_IO_STATE_ENABLE;  /* Recommanded setting to avoid glitches */
 
     if (leadingEdge) {
-        pHspi->Init.CLKPolarity = SPI_POLARITY_LOW;
-        pHspi->Init.CLKPhase = SPI_PHASE_1EDGE;
+        hspi->Init.CLKPolarity = SPI_POLARITY_LOW;
+        hspi->Init.CLKPhase = SPI_PHASE_1EDGE;
     }
     else {
-        pHspi->Init.CLKPolarity = SPI_POLARITY_HIGH;
-        pHspi->Init.CLKPhase = SPI_PHASE_2EDGE;
+        hspi->Init.CLKPolarity = SPI_POLARITY_HIGH;
+        hspi->Init.CLKPhase = SPI_PHASE_2EDGE;
     }
 
     if (spi->nss) {
         IOHi(IOGetByTag(spi->nss));
     }
 
-    HAL_SPI_Init(pHspi);
+    HAL_SPI_Init(hspi);
 
     spi->initDone = true;
     return true;
@@ -182,7 +187,7 @@ bool spiInitDevice(SPIDevice device, bool leadingEdge)
 uint8_t spiTransferByte(SPI_TypeDef *instance, uint8_t txByte)
 {
     uint8_t rxData;
-    spiTransfer(instance, &txByte, &rxData, 1);
+    spiTransfer(instance, &rxData, &txByte, 1);
     return rxData;
 }
 
@@ -192,23 +197,23 @@ uint8_t spiTransferByte(SPI_TypeDef *instance, uint8_t txByte)
 bool spiIsBusBusy(SPI_TypeDef *instance)
 {
     SPIDevice device = spiDeviceByInstance(instance);
-    return (hspi[device].State == HAL_SPI_STATE_BUSY);
+    return (spiHandle[device].State == HAL_SPI_STATE_BUSY);
 }
 
 bool spiTransfer(SPI_TypeDef *instance, uint8_t *rxData, const uint8_t *txData, int len)
 {
     SPIDevice device = spiDeviceByInstance(instance);
-    SPI_HandleTypeDef * pHspi = &hspi[device];
+    SPI_HandleTypeDef * hspi = &spiHandle[device];
     HAL_StatusTypeDef status;
 
     #define SPI_DEFAULT_TIMEOUT 10
 
     if (!rxData) {
-        status = HAL_SPI_Transmit(pHspi, txData, len, SPI_DEFAULT_TIMEOUT);
+        status = HAL_SPI_Transmit(hspi, txData, len, SPI_DEFAULT_TIMEOUT);
     } else if(!txData) {
-        status = HAL_SPI_Receive(pHspi, rxData, len, SPI_DEFAULT_TIMEOUT);
+        status = HAL_SPI_Receive(hspi, rxData, len, SPI_DEFAULT_TIMEOUT);
     } else {
-        status = HAL_SPI_TransmitReceive(pHspi, txData, rxData, len, SPI_DEFAULT_TIMEOUT);
+        status = HAL_SPI_TransmitReceive(hspi, txData, rxData, len, SPI_DEFAULT_TIMEOUT);
     }
 
     if(status != HAL_OK) {
@@ -221,11 +226,11 @@ bool spiTransfer(SPI_TypeDef *instance, uint8_t *rxData, const uint8_t *txData, 
 void spiSetSpeed(SPI_TypeDef *instance, SPIClockSpeed_e speed)
 {
     SPIDevice device = spiDeviceByInstance(instance);
-    SPI_HandleTypeDef * pHspi = &hspi[device];
+    SPI_HandleTypeDef * hspi = &spiHandle[device];
 
-    HAL_SPI_DeInit(pHspi);
-    pHspi->Init.BaudRatePrescaler = spiHardwareMap[device].divisorMap[speed];
-    HAL_SPI_Init(pHspi);
+    HAL_SPI_DeInit(hspi);
+    hspi->Init.BaudRatePrescaler = spiHardwareMap[device].divisorMap[speed];
+    HAL_SPI_Init(hspi);
 }
 
 SPI_TypeDef * spiInstanceByDevice(SPIDevice device)

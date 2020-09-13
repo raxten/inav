@@ -132,11 +132,6 @@
 #define IMU2_CS_PIN             PE11
 #define IMU2_EXTI_PIN           NONE
 
-#if 0
-
-#define USE_EXTI
-#define USE_MPU_DATA_READY_SIGNAL
-
 // *************** I2C /Baro/Mag *********************
 #define USE_I2C
 #define USE_I2C_DEVICE_1
@@ -167,6 +162,12 @@
 
 #define USE_RANGEFINDER
 #define RANGEFINDER_I2C_BUS     BUS_I2C2
+
+
+
+#if 0
+#define USE_EXTI
+#define USE_MPU_DATA_READY_SIGNAL
 
 // *************** ADC *****************************
 #define USE_ADC

@@ -17,6 +17,9 @@ glob_except(STM32F3_STDPERIPH_SRC "${STM32F3_STDPERIPH_SRC_DIR}/*.c" "${STM32F3_
 
 main_sources(STM32F3_SRC
     target/system_stm32f30x.c
+
+    config/config_streamer_stm32f3.c
+
     drivers/adc_stm32f30x.c
     drivers/bus_i2c_stm32f30x.c
     drivers/dma_stm32f3xx.c

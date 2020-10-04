@@ -34,6 +34,9 @@ glob_except(STM32F4_STDPERIPH_SRC "${STM32F4_STDPERIPH_SRC_DIR}/*.c" "${STM32F4_
 
 main_sources(STM32F4_SRC
     target/system_stm32f4xx.c
+
+    config/config_streamer_stm32f4.c
+
     drivers/adc_stm32f4xx.c
     drivers/adc_stm32f4xx.c
     drivers/bus_i2c_stm32f40x.c

@@ -1,3 +1,10 @@
+A Fork of the Betaflight/Cleanflight Flight Control Software
+
+The Betaflight software is open source, with this fork being created to support Pennsylvania State University's Unmanned Research Lab, under the supervision of Dr. Eric N. Johnson. This fork has been developed by Jacob Crouse with much support from Dr. Johnson. The purpose of this is to add functionality necessary for Betaflight to receive control commands from an external autopilot system, taking advantage of the flight controller's supported sensors (IMU, receiver integration). The thought is that the in AUTO mode the external autopilot software will control the system, but in MANUAL mode, the pilot will control with a transmitter, taking advantage of Betaflight's native SAS.
+
+NOTE: The SQUID CLI configuration file can be found in docs/CLIconfigs.
+Below is the original iNav's README.
+
 # INAV - navigation capable flight controller
 
 ## F3 based flight controllers

@@ -76,7 +76,7 @@ function(arm_none_eabi_gcc_install)
     endif()
     message("-- extracting ${basename}")
     execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${TOOLS_DIR})
-    execute_process(COMMAND ${CMAKE_COMMAND} -E tar xf ${output}
+    execute_process(COMMAND 7z x "${output}"
         RESULT_VARIABLE status
         WORKING_DIRECTORY ${TOOLS_DIR}
     )
